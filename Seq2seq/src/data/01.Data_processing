@@ -1,0 +1,34 @@
+#To
+
+def labelme_to_csv():
+    import os
+    import pandas as pd
+    import json
+    files = os.listdir("../../data/raw/labelmejson/")
+    data_csv=pd.DataFrame(columns=['UIID','label','xmin','xmax','ymin','ymax'])
+    for file in files:
+        if file.endswith(".json"):
+            with open('../../data/raw/labelmejson/'+file) as f:
+                data = json.load(f)
+                UIID=file
+                for elt in data['shapes']:
+                    label=elt['label']
+                    xmin= elt['points'][0][0]
+                    ymin= elt['points'][0][1]
+                    if len(elt['points'])==2:
+                        xmax= elt['points'][1][0]
+                        ymax= elt['points'][1][1]
+                    else:
+                        xmax=0
+                        ymax=0
+                    new_row = {'UIID': UIID, 'label': label, 'xmin': xmin, 'xmax': xmax, 'ymin': ymin, 'ymax':ymax}
+                    data_csv = data_csv.append(new_row, ignore_index=True)
+    return data_csv
+
+
+def main():
+    csv_data=labelme_to_csv()
+    csv_data.to_csv("../../data/processed/Orig_data_rico.csv")
+
+if __name__ == '__main__':
+    main()
